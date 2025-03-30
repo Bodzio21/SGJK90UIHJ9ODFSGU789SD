@@ -1,0 +1,899 @@
+local gui = Instance.new("ScreenGui")
+gui.Name = "CrazySpinMenu"
+gui.ResetOnSpawn = false
+gui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 280, 0, 420)
+mainFrame.Position = UDim2.new(0.85, 0, 0.5, -210)
+mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = gui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 12)
+mainCorner.Parent = mainFrame
+
+local frameShadow = Instance.new("Frame")
+frameShadow.Name = "FrameShadow"
+frameShadow.Size = UDim2.new(1, 14, 1, 14)
+frameShadow.Position = UDim2.new(0, -7, 0, -7)
+frameShadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+frameShadow.BackgroundTransparency = 0.8
+frameShadow.ZIndex = mainFrame.ZIndex - 1
+frameShadow.BorderSizePixel = 0
+frameShadow.Parent = mainFrame
+
+local frameShadowCorner = Instance.new("UICorner")
+frameShadowCorner.CornerRadius = UDim.new(0, 16)
+frameShadowCorner.Parent = frameShadow
+
+local title = Instance.new("TextLabel")
+title.Name = "Title"
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundColor3 = Color3.fromRGB(255, 90, 80)
+title.TextColor3 = Color3.fromRGB(0, 0, 255)
+title.Font = Enum.Font.GothamBold
+title.Text = ""
+title.TextSize = 20
+title.Parent = mainFrame
+
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 10)
+titleCorner.Parent = title
+
+local uiGradient = Instance.new("UIGradient")
+uiGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 40)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(50, 50, 70)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 30, 40))
+})
+uiGradient.Parent = title
+
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Name = "ButtonsScroll"
+scrollFrame.Size = UDim2.new(1, -20, 1, -100) 
+scrollFrame.Position = UDim2.new(0, 10, 0, 50)
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.BorderSizePixel = 0
+scrollFrame.ScrollBarThickness = 4
+scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(200, 200, 255)
+scrollFrame.ScrollBarImageTransparency = 0.3
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollFrame.Parent = mainFrame
+
+local stopButton = Instance.new("TextButton")
+stopButton.Name = "StopButton"
+stopButton.Size = UDim2.new(0.85, 0, 0, 40)
+stopButton.Position = UDim2.new(0.5, -119, 1, -50)
+stopButton.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
+stopButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+stopButton.Font = Enum.Font.GothamBold
+stopButton.Text = "STOP ALL MOVES"
+stopButton.TextSize = 16
+stopButton.Parent = mainFrame
+stopButton.BorderSizePixel = 0
+
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 10)
+uiCorner.Parent = stopButton
+
+local stopShadow = Instance.new("Frame")
+stopShadow.Name = "Shadow"
+stopShadow.Size = UDim2.new(1, 6, 1, 6)
+stopShadow.Position = UDim2.new(0, -3, 0, -3)
+stopShadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+stopShadow.BackgroundTransparency = 0.7
+stopShadow.ZIndex = stopButton.ZIndex - 1
+stopShadow.BorderSizePixel = 0
+stopShadow.Parent = stopButton
+
+local stopShadowCorner = Instance.new("UICorner")
+stopShadowCorner.CornerRadius = UDim.new(0, 10)
+stopShadowCorner.Parent = stopShadow
+
+local buttonCount = 0
+
+local function createButton(name, text, color, callback)
+    buttonCount = buttonCount + 1
+    
+    local button = Instance.new("TextButton")
+    button.Name = name
+    button.Size = UDim2.new(1, -10, 0, 45)
+    button.Position = UDim2.new(0, 5, 0, (buttonCount - 1) * 55 + 5)
+    button.BackgroundColor3 = color or Color3.fromRGB(60, 60, 70)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Font = Enum.Font.GothamSemibold
+    button.Text = text
+    button.TextSize = 16
+    button.Parent = scrollFrame
+    button.BorderSizePixel = 0
+    
+    local uiCorner = Instance.new("UICorner")
+    uiCorner.CornerRadius = UDim.new(0, 10)
+    uiCorner.Parent = button
+    
+    local shadow = Instance.new("Frame")
+    shadow.Name = "Shadow"
+    shadow.Size = UDim2.new(1, 6, 1, 6)
+    shadow.Position = UDim2.new(0, -3, 0, -3)
+    shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    shadow.BackgroundTransparency = 0.7
+    shadow.ZIndex = button.ZIndex - 1
+    shadow.BorderSizePixel = 0
+    shadow.Parent = button
+    
+    local shadowCorner = Instance.new("UICorner")
+    shadowCorner.CornerRadius = UDim.new(0, 10)
+    shadowCorner.Parent = shadow
+    
+    button.MouseButton1Click:Connect(callback)
+    
+    local hoverColor = Color3.fromRGB(
+        math.min(color.R * 1.2 * 255, 255),
+        math.min(color.G * 1.2 * 255, 255),
+        math.min(color.B * 1.2 * 255, 255)
+    )
+    
+    button.MouseEnter:Connect(function()
+        button.BackgroundColor3 = hoverColor
+        button:TweenSize(UDim2.new(1, -4, 0, 48), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.1, true)
+    end)
+    
+    button.MouseLeave:Connect(function()
+        button.BackgroundColor3 = color or Color3.fromRGB(60, 60, 70)
+        button:TweenSize(UDim2.new(1, -10, 0, 45), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.1, true)
+    end)
+    
+    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, buttonCount * 55 + 10)
+    
+    return button
+end
+
+createButton("SpinX", "Spin X-Axis", Color3.fromRGB(65, 105, 225), function()
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.PlatformStand = true
+            
+            local spin = Instance.new("BodyAngularVelocity")
+            spin.Name = "CrazySpinX"
+            spin.AngularVelocity = Vector3.new(25, 0, 0)
+            spin.MaxTorque = Vector3.new(50000, 0, 0)
+            spin.P = 1250
+            spin.Parent = character.HumanoidRootPart
+        end
+    end
+end)
+
+createButton("SpinY", "Spin Y-Axis", Color3.fromRGB(65, 105, 225), function()
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.PlatformStand = true
+            
+            local spin = Instance.new("BodyAngularVelocity")
+            spin.Name = "CrazySpinY"
+            spin.AngularVelocity = Vector3.new(0, 25, 0)
+            spin.MaxTorque = Vector3.new(0, 50000, 0)
+            spin.P = 1250
+            spin.Parent = character.HumanoidRootPart
+        end
+    end
+end)
+
+createButton("SpinZ", "Spin Z-Axis", Color3.fromRGB(65, 105, 225), function()
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.PlatformStand = true
+            
+            local spin = Instance.new("BodyAngularVelocity")
+            spin.Name = "CrazySpinZ"
+            spin.AngularVelocity = Vector3.new(0, 0, 25)
+            spin.MaxTorque = Vector3.new(0, 0, 50000)
+            spin.P = 1250
+            spin.Parent = character.HumanoidRootPart
+        end
+    end
+end)
+
+createButton("CrazyAll", "CRAZY ALL DIRECTIONS", Color3.fromRGB(180, 65, 225), function()
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.PlatformStand = true
+            
+            local spin = Instance.new("BodyAngularVelocity")
+            spin.Name = "CrazySpinAll"
+            spin.AngularVelocity = Vector3.new(30, 30, 30)
+            spin.MaxTorque = Vector3.new(50000, 50000, 50000)
+            spin.P = 1250
+            spin.Parent = character.HumanoidRootPart
+            
+            local pulse = true
+            
+            spawn(function()
+                while spin.Parent do
+                    if pulse then
+                        spin.AngularVelocity = Vector3.new(30, 30, 30)
+                    else
+                        spin.AngularVelocity = Vector3.new(-30, -30, -30)
+                    end
+                    pulse = not pulse
+                    wait(0.5)
+                end
+            end)
+        end
+    end
+end)
+
+createButton("TornadoSpin", "TORNADO SPIN", Color3.fromRGB(255, 120, 50), function()
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.PlatformStand = true
+            
+            local spin = Instance.new("BodyAngularVelocity")
+            spin.Name = "TornadoSpin"
+            spin.AngularVelocity = Vector3.new(40, 40, 40)
+            spin.MaxTorque = Vector3.new(100000, 100000, 100000)
+            spin.P = 2500
+            spin.Parent = character.HumanoidRootPart
+            
+            spawn(function()
+                while spin.Parent do
+                    spin.AngularVelocity = Vector3.new(
+                        math.random(-50, 50),
+                        math.random(-50, 50),
+                        math.random(-50, 50)
+                    )
+                    wait(0.2)
+                end
+            end)
+            
+            local bodyForce = Instance.new("BodyForce")
+            bodyForce.Name = "TornadoForce"
+            bodyForce.Force = Vector3.new(0, 2000, 0)
+            bodyForce.Parent = character.HumanoidRootPart
+        end
+    end
+end)
+
+createButton("FloatingFlips", "FLOATING BACKFLIPS", Color3.fromRGB(50, 220, 120), function()
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.PlatformStand = true
+            
+            local spin = Instance.new("BodyAngularVelocity")
+            spin.Name = "BackflipSpin"
+            spin.AngularVelocity = Vector3.new(15, 0, 0)
+            spin.MaxTorque = Vector3.new(30000, 0, 0)
+            spin.P = 1250
+            spin.Parent = character.HumanoidRootPart
+            
+            local floatForce = Instance.new("BodyForce")
+            floatForce.Name = "FloatForce"
+            floatForce.Force = Vector3.new(0, character.HumanoidRootPart:GetMass() * workspace.Gravity + 500, 0)
+            floatForce.Parent = character.HumanoidRootPart
+            
+            spawn(function()
+                local rising = true
+                while floatForce.Parent do
+                    if rising then
+                        floatForce.Force = Vector3.new(0, character.HumanoidRootPart:GetMass() * workspace.Gravity + 1000, 0)
+                    else
+                        floatForce.Force = Vector3.new(0, character.HumanoidRootPart:GetMass() * workspace.Gravity - 500, 0)
+                    end
+                    rising = not rising
+                    wait(1)
+                end
+            end)
+        end
+    end
+end)
+
+createButton("CrazyOrbit", "CRAZY ORBIT MODE", Color3.fromRGB(230, 190, 60), function()
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.PlatformStand = true
+            
+            local orbitPoint = Instance.new("Part")
+            orbitPoint.Name = "OrbitPoint"
+            orbitPoint.Anchored = true
+            orbitPoint.CanCollide = false
+            orbitPoint.Transparency = 1
+            orbitPoint.Position = character.HumanoidRootPart.Position + Vector3.new(0, 0, 10)
+            orbitPoint.Parent = workspace
+            
+            local attachment0 = Instance.new("Attachment")
+            attachment0.Name = "OrbitAttachment"
+            attachment0.Parent = character.HumanoidRootPart
+            
+            local attachment1 = Instance.new("Attachment")
+            attachment1.Name = "CenterAttachment"
+            attachment1.Parent = orbitPoint
+            
+            local alignPosition = Instance.new("AlignPosition")
+            alignPosition.Name = "OrbitAlign"
+            alignPosition.Attachment0 = attachment0
+            alignPosition.Attachment1 = attachment1
+            alignPosition.MaxForce = 10000
+            alignPosition.Responsiveness = 10
+            alignPosition.RigidityEnabled = false
+            alignPosition.Parent = character.HumanoidRootPart
+            
+            local spin = Instance.new("BodyAngularVelocity")
+            spin.Name = "OrbitSpin"
+            spin.AngularVelocity = Vector3.new(0, 8, 0)
+            spin.MaxTorque = Vector3.new(0, 50000, 0)
+            spin.P = 1250
+            spin.Parent = orbitPoint
+            
+            local characterSpin = Instance.new("BodyAngularVelocity")
+            characterSpin.Name = "CharacterOrbitSpin"
+            characterSpin.AngularVelocity = Vector3.new(15, 0, 0)
+            characterSpin.MaxTorque = Vector3.new(50000, 0, 0)
+            characterSpin.P = 1250
+            characterSpin.Parent = character.HumanoidRootPart
+            
+            character.HumanoidRootPart:SetAttribute("OrbitPointRef", orbitPoint:GetFullName())
+        end
+    end
+end)
+
+createButton("Ragdoll", "RAGDOLL MODE", Color3.fromRGB(130, 130, 220), function()
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.PlatformStand = true
+            
+            for _, joint in pairs(character:GetDescendants()) do
+                if joint:IsA("Motor6D") and joint.Name ~= "Neck" and joint.Name ~= "Root" then
+                    local force = Instance.new("BodyForce")
+                    force.Name = "RagdollForce"
+                    force.Force = Vector3.new(0, joint.Part1:GetMass() * workspace.Gravity * 0.85, 0)
+                    force.Parent = joint.Part1
+                end
+            end
+            
+            spawn(function()
+                while humanoid.PlatformStand do
+                    for _, part in pairs(character:GetChildren()) do
+                        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                            part.Velocity = part.Velocity + Vector3.new(
+                                math.random(-2, 2),
+                                math.random(-2, 2),
+                                math.random(-2, 2)
+                            )
+                        end
+                    end
+                    wait(0.5)
+                end
+            end)
+        end
+    end
+end)
+
+createButton("BouncyMode", "BOUNCY MODE", Color3.fromRGB(80, 210, 210), function()
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.PlatformStand = true
+            
+            local bounceForce = Instance.new("BodyVelocity")
+            bounceForce.Name = "BounceForce"
+            bounceForce.Velocity = Vector3.new(0, 50, 0)
+            bounceForce.MaxForce = Vector3.new(0, 5000, 0)
+            bounceForce.P = 1250
+            bounceForce.Parent = character.HumanoidRootPart
+            
+            spawn(function()
+                local isUp = true
+                while bounceForce.Parent do
+                    if isUp then
+                        bounceForce.Velocity = Vector3.new(0, 50, 0)
+                        wait(0.5)
+                    else
+                        bounceForce.Velocity = Vector3.new(0, -20, 0)
+                        wait(0.3)
+                    end
+                    isUp = not isUp
+                end
+            end)
+            
+            local bounceSpin = Instance.new("BodyAngularVelocity")
+            bounceSpin.Name = "BounceSpin"
+            bounceSpin.AngularVelocity = Vector3.new(0, 2, 0)
+            bounceSpin.MaxTorque = Vector3.new(0, 10000, 0)
+            bounceSpin.P = 1250
+            bounceSpin.Parent = character.HumanoidRootPart
+        end
+    end
+end)
+
+createButton("RocketMode", "🚀 ROCKET MODE 🚀", Color3.fromRGB(230, 80, 80), function()
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.PlatformStand = true
+            
+            local bodyGyro = Instance.new("BodyGyro")
+            bodyGyro.Name = "RocketGyro"
+            bodyGyro.D = 100
+            bodyGyro.P = 10000
+            bodyGyro.MaxTorque = Vector3.new(10000, 10000, 10000)
+            bodyGyro.CFrame = CFrame.new(character.HumanoidRootPart.Position, character.HumanoidRootPart.Position + Vector3.new(0, 0, 1))
+            bodyGyro.Parent = character.HumanoidRootPart
+            
+            local rocketForce = Instance.new("BodyVelocity")
+            rocketForce.Name = "RocketForce"
+            rocketForce.MaxForce = Vector3.new(10000, 10000, 10000)
+            rocketForce.Velocity = Vector3.new(0, 0, 0)
+            rocketForce.Parent = character.HumanoidRootPart
+            
+            spawn(function()
+                local launching = false
+                local speed = 0
+                local maxSpeed = 100
+                
+                while rocketForce.Parent do
+                    if launching then
+                        speed = math.min(speed + 5, maxSpeed)
+                        bodyGyro.CFrame = CFrame.Angles(0, math.rad(math.random(-5, 5)), 0) * CFrame.Angles(math.rad(-80), 0, 0)
+                        
+                        local smoke = Instance.new("Part")
+                        smoke.Anchored = true
+                        smoke.CanCollide = false
+                        smoke.Size = Vector3.new(1, 1, 1)
+                        smoke.Position = character.HumanoidRootPart.Position - Vector3.new(0, 3, 0)
+                        smoke.Transparency = 0.5
+                        smoke.Color = Color3.fromRGB(255, math.random(100, 200), 0)
+                        smoke.Material = Enum.Material.Neon
+                        smoke.Parent = workspace
+                        
+                        spawn(function()
+                            for i = 1, 10 do
+                                smoke.Transparency = smoke.Transparency + 0.05
+                                smoke.Size = smoke.Size + Vector3.new(0.2, 0.2, 0.2)
+                                wait(0.05)
+                            end
+                            smoke:Destroy()
+                        end)
+                    else
+                        speed = math.max(speed - 1, 0)
+                        bodyGyro.CFrame = CFrame.Angles(0, math.rad(math.random(-20, 20)), 0)
+                    end
+                    
+                    local lookVector = (bodyGyro.CFrame * CFrame.Angles(math.rad(90), 0, 0)).LookVector
+                    rocketForce.Velocity = lookVector * speed
+                    
+                    if math.random(1, 100) < 3 then
+                        launching = not launching
+                    end
+                    
+                    wait(0.05)
+                end
+            end)
+        end
+    end
+end)
+
+createButton("DizzyMode", "DIZZY MODE", Color3.fromRGB(200, 80, 200), function()
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.PlatformStand = true
+            
+            local dizzyForce = Instance.new("BodyVelocity")
+            dizzyForce.Name = "DizzyForce"
+            dizzyForce.P = 3000
+            dizzyForce.MaxForce = Vector3.new(10000, 10000, 10000)
+            dizzyForce.Velocity = Vector3.new(0, 0, 0)
+            dizzyForce.Parent = character.HumanoidRootPart
+            
+            local dizzySpin = Instance.new("BodyAngularVelocity")
+            dizzySpin.Name = "DizzySpin"
+            dizzySpin.AngularVelocity = Vector3.new(5, 8, 3)
+            dizzySpin.MaxTorque = Vector3.new(20000, 20000, 20000)
+            dizzySpin.P = 1000
+            dizzySpin.Parent = character.HumanoidRootPart
+            
+            spawn(function()
+                while dizzyForce.Parent do
+                    dizzyForce.Velocity = Vector3.new(
+                        math.random(-10, 10),
+                        math.random(-5, 15),
+                        math.random(-10, 10)
+                    )
+                    
+                    dizzySpin.AngularVelocity = Vector3.new(
+                        math.random(-10, 10),
+                        math.random(-10, 10),
+                        math.random(-10, 10)
+                    )
+                    
+                    wait(math.random(2, 5) / 10)
+                end
+            end)
+        end
+    end
+end)
+
+stopButton.MouseEnter:Connect(function()
+    stopButton.BackgroundColor3 = Color3.fromRGB(250, 70, 70)
+    stopButton:TweenSize(UDim2.new(0.88, 0, 0, 42), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.1, true)
+end)
+
+stopButton.MouseLeave:Connect(function()
+    stopButton.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
+    stopButton:TweenSize(UDim2.new(0.85, 0, 0, 40), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.1, true)
+end)
+
+stopButton.MouseButton1Click:Connect(function()
+    local character = game.Players.LocalPlayer.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.PlatformStand = false
+            
+            for _, v in pairs(character.HumanoidRootPart:GetChildren()) do
+                if (v:IsA("BodyAngularVelocity") or
+                    v:IsA("BodyVelocity") or
+                    v:IsA("BodyForce") or
+                    v:IsA("BodyGyro") or
+                    v:IsA("AlignPosition") or
+                    v:IsA("Attachment"))
+                then
+                    v:Destroy()
+                end
+            end
+            
+            for _, part in pairs(character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    for _, force in pairs(part:GetChildren()) do
+                        if force:IsA("BodyForce") and force.Name == "RagdollForce" then
+                            force:Destroy()
+                        end
+                    end
+                end
+            end
+            
+            local orbitPointRef = character.HumanoidRootPart:GetAttribute("OrbitPointRef")
+            if orbitPointRef then
+                local success, orbitPoint = pcall(function() return game:GetService("Workspace"):FindFirstChild(orbitPointRef:match("[^%.]+$")) end)
+                if success and orbitPoint then
+                    orbitPoint:Destroy()
+                end
+                character.HumanoidRootPart:SetAttribute("OrbitPointRef", nil)
+            end
+        end
+    end
+end)
+
+local isDragging = false
+local dragInput = nil
+local dragStart = nil
+local startPos = nil
+
+local function update(input)
+    local delta = input.Position - dragStart
+    mainFrame:TweenPosition(
+        UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y),
+        Enum.EasingDirection.Out,
+        Enum.EasingStyle.Quad,
+        0.1,
+        true
+    )
+end
+
+title.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        isDragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                isDragging = false
+            end
+        end)
+    end
+end)
+
+title.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+title.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        isDragging = false
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInput and isDragging then
+        update(input)
+    end
+end)
+
+spawn(function()
+    while wait(0.03) do
+        uiGradient.Offset = Vector2.new((uiGradient.Offset.X + 0.01) % 1, 0)
+    end
+end)
+
+local function flashButton(button)
+    local originalColor = button.BackgroundColor3
+    button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    
+    spawn(function()
+        for i = 0, 1, 0.1 do
+            button.BackgroundColor3 = Color3.fromRGB(
+                originalColor.R * i + 255 * (1-i),
+                originalColor.G * i + 255 * (1-i),
+                originalColor.B * i + 255 * (1-i)
+            )
+            wait(0.02)
+        end
+        button.BackgroundColor3 = originalColor
+    end)
+end
+
+for _, button in pairs(scrollFrame:GetChildren()) do
+    if button:IsA("TextButton") then
+        button.MouseButton1Click:Connect(function()
+            flashButton(button)
+        end)
+    end
+end
+
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Name = "MinimizeButton"
+minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+minimizeButton.Position = UDim2.new(1, -35, 0, 5)
+minimizeButton.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeButton.Font = Enum.Font.GothamBold
+minimizeButton.Text = "-"
+minimizeButton.TextSize = 24
+minimizeButton.BorderSizePixel = 0
+minimizeButton.ZIndex = 10
+minimizeButton.Parent = mainFrame
+
+local minimizeCorner = Instance.new("UICorner")
+minimizeCorner.CornerRadius = UDim.new(0, 8)
+minimizeCorner.Parent = minimizeButton
+
+local isMinimized = false
+
+minimizeButton.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    
+    if isMinimized then
+        mainFrame:TweenSize(
+            UDim2.new(0, 280, 0, 40),
+            Enum.EasingDirection.Out,
+            Enum.EasingStyle.Quad,
+            0.3,
+            true
+        )
+        scrollFrame.Visible = false
+        stopButton.Visible = false
+        minimizeButton.Text = "+"
+    else
+        mainFrame:TweenSize(
+            UDim2.new(0, 280, 0, 420),
+            Enum.EasingDirection.Out,
+            Enum.EasingStyle.Quad,
+            0.3,
+            true
+        )
+        scrollFrame.Visible = true
+        stopButton.Visible = true
+        minimizeButton.Text = "-"
+    end
+end)
+
+minimizeButton.MouseEnter:Connect(function()
+    minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 70)
+end)
+
+minimizeButton.MouseLeave:Connect(function()
+    minimizeButton.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+end)
+
+-- Creating random animations for buttons
+spawn(function()
+    while wait(2) do
+        local buttons = scrollFrame:GetChildren()
+        local randomButton = buttons[math.random(1, #buttons)]
+        if randomButton:IsA("TextButton") then
+            randomButton:TweenSize(
+                UDim2.new(1, -4, 0, 48),
+                Enum.EasingDirection.Out,
+                Enum.EasingStyle.Bounce,
+                0.5,
+                true
+            )
+            wait(0.5)
+            randomButton:TweenSize(
+                UDim2.new(1, -10, 0, 45),
+                Enum.EasingDirection.Out,
+                Enum.EasingStyle.Quad,
+                0.5,
+                true
+            )
+        end
+    end
+end)
+
+-- Add notification system
+local notificationFrame = Instance.new("Frame")
+notificationFrame.Name = "NotificationFrame"
+notificationFrame.Size = UDim2.new(0, 0, 0, 40)
+notificationFrame.Position = UDim2.new(0.5, 0, 0, -50)
+notificationFrame.AnchorPoint = Vector2.new(0.5, 0)
+notificationFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+notificationFrame.BorderSizePixel = 0
+notificationFrame.Parent = gui
+
+local notifCorner = Instance.new("UICorner")
+notifCorner.CornerRadius = UDim.new(0, 8)
+notifCorner.Parent = notificationFrame
+
+local notifText = Instance.new("TextLabel")
+notifText.Name = "NotificationText"
+notifText.Size = UDim2.new(1, -20, 1, 0)
+notifText.Position = UDim2.new(0, 10, 0, 0)
+notifText.BackgroundTransparency = 1
+notifText.TextColor3 = Color3.fromRGB(255, 255, 255)
+notifText.Font = Enum.Font.GothamSemibold
+notifText.Text = ""
+notifText.TextSize = 16
+notifText.TextWrapped = true
+notifText.Parent = notificationFrame
+
+local function showNotification(text, color)
+    notificationFrame.BackgroundColor3 = color or Color3.fromRGB(40, 40, 50)
+    notifText.Text = text
+    
+    notificationFrame:TweenSize(
+        UDim2.new(0, 280, 0, 40),
+        Enum.EasingDirection.Out,
+        Enum.EasingStyle.Quad,
+        0.3,
+        true
+    )
+    
+    notificationFrame:TweenPosition(
+        UDim2.new(0.5, 0, 0, 20),
+        Enum.EasingDirection.Out,
+        Enum.EasingStyle.Quad,
+        0.3,
+        true
+    )
+    
+    wait(2)
+    
+    notificationFrame:TweenPosition(
+        UDim2.new(0.5, 0, 0, -50),
+        Enum.EasingDirection.Out,
+        Enum.EasingStyle.Quad,
+        0.3,
+        true
+    )
+    
+    wait(0.3)
+    
+    notificationFrame:TweenSize(
+        UDim2.new(0, 0, 0, 40),
+        Enum.EasingDirection.Out,
+        Enum.EasingStyle.Quad,
+        0.3,
+        true
+    )
+end
+
+for _, button in pairs(scrollFrame:GetChildren()) do
+    if button:IsA("TextButton") then
+        local originalClick = button.MouseButton1Click:Connect(function() end)
+        button.MouseButton1Click:Connect(function()
+            showNotification("Activated: " .. button.Text, button.BackgroundColor3)
+        end)
+    end
+end
+
+stopButton.MouseButton1Click:Connect(function()
+    showNotification("All crazy moves stopped!", Color3.fromRGB(220, 60, 60))
+end)
+
+-- Add fade-in animation
+mainFrame.Position = UDim2.new(0.85, 300, 0.5, -210)
+mainFrame.BackgroundTransparency = 1
+title.BackgroundTransparency = 1
+title.TextTransparency = 1
+stopButton.BackgroundTransparency = 1
+stopButton.TextTransparency = 1
+minimizeButton.BackgroundTransparency = 1
+minimizeButton.TextTransparency = 1
+frameShadow.BackgroundTransparency = 1
+stopShadow.BackgroundTransparency = 1
+
+for _, button in pairs(scrollFrame:GetChildren()) do
+    if button:IsA("TextButton") then
+        button.BackgroundTransparency = 1
+        button.TextTransparency = 1
+        button.Shadow.BackgroundTransparency = 1
+    end
+end
+
+wait(0.1)
+
+mainFrame:TweenPosition(
+    UDim2.new(0.85, 0, 0.5, -210),
+    Enum.EasingDirection.Out,
+    Enum.EasingStyle.Back,
+    0.5,
+    true
+)
+
+for i = 1, 0, -0.1 do
+    mainFrame.BackgroundTransparency = i
+    title.BackgroundTransparency = i
+    title.TextTransparency = i
+    stopButton.BackgroundTransparency = i
+    stopButton.TextTransparency = i
+    minimizeButton.BackgroundTransparency = i
+    minimizeButton.TextTransparency = i
+    frameShadow.BackgroundTransparency = 0.8 + (i * 0.2)
+    stopShadow.BackgroundTransparency = 0.7 + (i * 0.3)
+    
+    wait(0.03)
+end
+
+wait(0.2)
+
+for _, button in pairs(scrollFrame:GetChildren()) do
+    if button:IsA("TextButton") then
+        spawn(function()
+            for i = 1, 0, -0.2 do
+                button.BackgroundTransparency = i
+                button.TextTransparency = i
+                button.Shadow.BackgroundTransparency = 0.7 + (i * 0.3)
+                wait(0.02)
+            end
+        end)
+        wait(0.05)
+    end
+end
+
+-- Add keybind to toggle GUI visibility
+local guiVisible = true
+game:GetService("UserInputService").InputBegan:Connect(function(input, processed)
+    if not processed and input.KeyCode == Enum.KeyCode.RightControl then
+        guiVisible = not guiVisible
+        gui.Enabled = guiVisible
+        
+        if guiVisible then
+            showNotification("Crazy Moves Menu Enabled", Color3.fromRGB(60, 180, 100))
+        end
+    end
+end)
+
+showNotification("Crazy Moves Menu Loaded! Press Right Ctrl to Toggle", Color3.fromRGB(60, 180, 100))
